@@ -1,0 +1,11 @@
+Source: qldeb
+Section: lisp
+Priority: optional
+Maintainer: Florian Margaine <florian@margaine.com>
+Build-Depends: dh-quicklisp-buildapp
+Standards-Version: 3.9.6
+
+Package: qldeb
+Architecture: amd64
+Depends: ${shlibs:Depends}, ${misc:Depends}, cdebootstrap, chroot
+Description: Transforms all of quicklisp in debian packages
