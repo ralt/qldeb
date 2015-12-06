@@ -24,7 +24,7 @@ http://httpredir.debian.org/debian" (namestring ,temp)))
   (with-chroot (env)
     (let ((channel (lparallel:make-channel)))
       (dolist (release-object (release-objects (ql-dist:find-dist "quicklisp")))
-        (lparallel:submit-task channel #'download-release
+        (lparallel:submit-task channel #'install-release
                                env release-object))
       (loop while systems = (lparallel:receive-result channel)
          do (mapcar (lambda (system)
@@ -49,22 +49,32 @@ http://httpredir.debian.org/debian" (namestring ,temp)))
     (last
      (uiop:split-string (ql-dist:archive-url release) :separator "/")))))
 
-(defun download-release (env release-object)
-  (let* ((release (first release-object))
-         (archive-url (ql-dist:archive-url release))
-         (name (archive-name release)))
-    (with-open-file (f (merge-pathnames name env)
-                       :direction :output
-                       :element-type '(unsigned-byte 8)
-                       :if-does-not-exist :create)
-      (format t "downloading ~A...~%" archive-url)
-      (let ((archive (drakma:http-request archive-url :force-binary t)))
-        (unless (check-archive release archive)
-          (format t "~A corrupted, trying again...~%" (namestring (merge-pathnames name env)))
-          (close archive)
-          (return-from download-release (download-release env release-object)))
-        (write-sequence archive f)
-        (format t "~A is downloaded to ~A~%" archive-url (namestring (merge-pathnames name env)))))))
+(defun install-release (env release-object)
+  (multiple-value-prog1 (second release-object)
+    (let* ((release (first release-object))
+           (archive-url (ql-dist:archive-url release))
+           (name (archive-name release)))
+      (download-release (merge-pathnames name env) archive-url)
+      (extract-release env name))))
+
+(defun extract-release (env name)
+  (uiop:run-program
+   (format nil "tar xf ~A -C ~A"
+           (merge-pathnames name env)
+           (merge-pathnames name #p"/root/common-lisp/"))))
+
+(defun download-release (path url)
+  (with-open-file (f path
+                     :direction :output
+                     :element-type '(unsigned-byte 8)
+                     :if-does-not-exist :create)
+    (format t "downloading ~A...~%" url)
+    (let ((archive (drakma:http-request archive-url :force-binary t)))
+      (unless (check-archive release archive)
+        (format t "~A corrupted, trying again...~%" (namestring path))
+        (return-from download-release (download-release env release-object)))
+      (write-sequence archive f)
+      (format t "~A is downloaded to ~A~%" url (namestring path)))))
 
 (defun check-archive (release archive)
   (and (check-archive-sha1 (ql-dist:archive-content-sha1 release) archive)
