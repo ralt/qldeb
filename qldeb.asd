@@ -3,8 +3,9 @@
   :author "Florian Margaine <florian@margaine.com>"
   :license "MIT License"
   :serial t
-  :depends-on (:lparallel :drakma :quicklisp :uiop :sb-posix :ironclad)
+  :depends-on (:lparallel :drakma :quicklisp :uiop :sb-posix :ironclad :djula)
   :components ((:file "package")
                (:file "release")
+               (:file "templates")
                (:file "debian")
                (:file "qldeb")))

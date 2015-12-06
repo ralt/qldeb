@@ -22,16 +22,6 @@ put some generated files in there."
                              :if-does-not-exist :create)
             (write-sequence (funcall (car file) system) f)))))
 
-(defun control-file (system))
-
-(defun changelog-file (system))
-
-(defun compat-file (system))
-
-(defun copyright-file (system))
-
-(defun rules-file (system))
-
 (defun build-package (env system)
   (uiop:chdir (merge-pathnames
                (uiop:strcat (ql-dist:prefix system) "/")
