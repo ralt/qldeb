@@ -31,8 +31,6 @@ http://httpredir.debian.org/debian" (namestring ,temp)))
                       (build-debian-package env system))
                     systems)))))
 
-(defun build-debian-package (env system))
-
 ;;; Copy pasted from sb-cpu-affinity
 (defun cpu-count ()
   (let* ((key "processor")

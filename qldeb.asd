@@ -6,4 +6,5 @@
   :depends-on (:lparallel :drakma :quicklisp :uiop :sb-posix :ironclad)
   :components ((:file "package")
                (:file "release")
+               (:file "debian")
                (:file "qldeb")))
