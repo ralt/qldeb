@@ -3,6 +3,7 @@
 (defmacro with-chroot (var &body body)
   (let ((temp (gensym)))
     `(let ((,temp (pathname (uiop:strcat (sb-posix:mkdtemp "/tmp/qldeb.XXXXXX") "/"))))
+       (format t "Creating cdebootstrap environment~%")
        (uiop:run-program
         (format nil "cdebootstrap \\
 --arch=amd64 \\
@@ -13,6 +14,7 @@ debian/jessie \\
 http://httpredir.debian.org/debian" (namestring ,temp)))
        (let ((,@var ,temp))
          ,@body)
+       (format t "Deleting cdebootstrap environment~%")
        (uiop:delete-directory-tree ,temp :validate t))))
 
 (defun main (args)

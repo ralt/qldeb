@@ -1,2 +1,3 @@
 (defpackage #:qldeb
-  (:use #:cl))
+  (:use #:cl)
+  (:export :main))
