@@ -29,7 +29,7 @@
                      :element-type '(unsigned-byte 8)
                      :if-does-not-exist :create)
     (format t "downloading ~A...~%" url)
-    (let ((archive (drakma:http-request archive-url :force-binary t)))
+    (let ((archive (drakma:http-request url :force-binary t)))
       (unless (check-archive release archive)
         (format t "~A corrupted, trying again...~%" (namestring path))
         (return-from download-release (download-release env release-object)))
