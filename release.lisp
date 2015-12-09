@@ -14,7 +14,7 @@
   (multiple-value-prog1 (ql-dist:provided-systems release)
     (let ((archive-url (ql-dist:archive-url release))
           (name (archive-name release)))
-      (download-release (merge-pathnames name env) archive-url)
+      (download-release release (merge-pathnames name env) archive-url)
       (extract-release env name))))
 
 (defun extract-release (env name)
@@ -23,7 +23,7 @@
            (merge-pathnames name env)
            (merge-pathnames name #p"/root/common-lisp/"))))
 
-(defun download-release (path url)
+(defun download-release (release path url)
   (with-open-file (f path
                      :direction :output
                      :element-type '(unsigned-byte 8)
