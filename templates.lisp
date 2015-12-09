@@ -8,9 +8,8 @@
 (dolist (file '("control" "changelog" "compat" "copyright" "rules" "install"))
   (setf (gethash file *templates*) (djula:compile-template* file)))
 
-(defmacro render (template &body body)
-  `(djula:render-template* (gethash ,template *templates*) nil
-                           ,@body))
+(defun render (template &rest args)
+  (apply #'djula:render-template* template nil args))
 
 (defun control-file (folder file system)
   (declare (ignore folder))
