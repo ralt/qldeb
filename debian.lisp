@@ -10,6 +10,7 @@
   Debianizing a system is just creating the debian/ folder and
   putting some generated files in there.
   "
+  (format t "debianizing ~A...~%" (ql-dist:name system))
   (let* ((system-folder (merge-pathnames
                          (uiop:strcat (ql-dist:prefix system) "/")
                          (merge-pathnames #p"root/common-lisp/" env)))
@@ -30,22 +31,28 @@
        do (with-open-file (f (merge-pathnames (cdr file) debian-folder)
                              :direction :output
                              :if-does-not-exist :create)
+            (format t "rendering ~A~%" (namestring
+                                      (merge-pathnames (cdr file) debian-folder)))
             (write-sequence (funcall (car file)
-                                     system-folder system-file system) f)))))
+                                     system-folder system-file system) f)))
+    (format t "~A debianized.~%" (ql-dist:name system))))
 
 (defun build-package (env system)
+  (format t "building ~A...~%" (ql-dist:name system))
   (uiop:chdir (merge-pathnames
                (uiop:strcat (ql-dist:prefix system) "/")
                (merge-pathnames #p"root/common-lisp/" env)))
   ;; Don't sign the packages for now. We don't
   ;; yet know how to handle gpg prompt.
-  (uiop:run-program "dpkg-buildpackage -us -uc"))
+  (uiop:run-program "dpkg-buildpackage -us -uc")
+  (format t "~A debian package built.~%" (ql-dist:name system)))
 
 (defun copy-package (env system)
-  (dolist (file (package-files system))
-    (rename-file (merge-pathnames file
-                                  (merge-pathnames #p"root/common-lisp/" env))
-                 file)))
+  (dolist (dest (package-files system))
+    (let ((source (merge-pathnames dest
+                                   (merge-pathnames #p"root/common-lisp/" env))))
+      (format t "moving ~A to ~A~%" source dest)
+      (rename-file source dest))))
 
 (defun package-files (system)
   (let ((name (ql-dist:name system))
