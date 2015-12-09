@@ -20,15 +20,18 @@
                          (format nil "~A.asd"
                                  (ql-dist:system-file-name system))
                          system-folder)))))
+    (ensure-directories-exist debian-folder)
     (loop for file in `((,#'control-file . "control")
                         (,#'changelog-file . "changelog")
                         (,#'compat-file . "compat")
                         (,#'copyright-file . "copyright")
-                        (,#'rules-file . "rules"))
+                        (,#'rules-file . "rules")
+                        (,#'install-file . "install"))
        do (with-open-file (f (merge-pathnames (cdr file) debian-folder)
                              :direction :output
                              :if-does-not-exist :create)
-            (write-sequence (funcall (car file) system-file system) f)))))
+            (write-sequence (funcall (car file)
+                                     system-folder system-file system) f)))))
 
 (defun build-package (env system)
   (uiop:chdir (merge-pathnames

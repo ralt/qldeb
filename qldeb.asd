@@ -10,7 +10,8 @@
                :sb-posix
                :ironclad
                :djula
-               :local-time)
+               :local-time
+               :cl-ppcre)
   :components ((:file "package")
                (:file "release")
                (:file "templates")

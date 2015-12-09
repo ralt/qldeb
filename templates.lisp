@@ -5,18 +5,19 @@
 
 (defvar *templates* (make-hash-table :test #'equal))
 
-(dolist (file '("control" "changelog" "compat" "copyright" "rules"))
+(dolist (file '("control" "changelog" "compat" "copyright" "rules" "install"))
   (setf (gethash file *templates*) (djula:compile-template* file)))
 
-(defun control-file (system-file system)
+(defun control-file (folder file system)
+  (declare (ignore folder))
   (djula:render-template*
    (gethash "control" *templates*) nil
    :name (ql-dist:name system)
-   :author (getf system-file :author)
-   :short-description (getf system-file :description)
-   (when (getf system-file :long-description)
+   :author (getf file :author)
+   :short-description (getf file :description)
+   (when (getf file :long-description)
      :long-description (format-long-description
-                        (getf system-file :long-description)))
+                        (getf file :long-description)))
    (when (ql-dist:required-systems system)
      :dependencies (format-dependencies
                     system
@@ -35,18 +36,34 @@
   (format nil "~{ ~A~%~}~%" (uiop:split-string text :separator "
 ")))
 
-(defun changelog-file (system-file system)
+(defun changelog-file (folder file system)
+  (declare (ignore folder))
   (djula:render-template*
    (gethash "changelog" *templates*) nil
    :name (ql-dist:name system)
    :version (system-version system)
-   :author (getf system-file :author)
+   :author (getf file :author)
    :date (local-time:to-rfc1123-timestring (local-time:now))))
 
-(defun compat-file (system-file system)
-  (declare (ignore system-file system))
+(defun compat-file (folder file system)
+  (declare (ignore folder file system))
   (djula:render-template* (gethash "compat" *templates*) nil))
 
-(defun copyright-file (system-file system))
+(defun copyright-file (folder file system)
+  (declare (ignore folder system))
+  (djula:render-template*
+   (gethash "copyright" *templates*) nil
+   ;; Make this case-insensitive
+   :mit-license (cl-ppcre:scan "^mit license$" (getf file :license))))
 
-(defun rules-file (system-file system))
+(defun rules-file (folder file system)
+  (declare (ignore folder file system))
+  (djula:render-template* (gethash "rules" *templates*) nil))
+
+(defun install-file (folder file system)
+  (declare (ignore file))
+  (djla:render-template*
+   (gethash "install" *templates*) nil
+   :lines (format-lines system folder)))
+
+(defun format-lines (system folder))
