@@ -53,8 +53,7 @@
   (declare (ignore folder system))
   (djula:render-template*
    (gethash "copyright" *templates*) nil
-   ;; Make this case-insensitive
-   :mit-license (cl-ppcre:scan "^mit license$" (getf file :license))))
+   :mit-license (cl-ppcre:scan "(?i)^mit license$" (getf file :license))))
 
 (defun rules-file (folder file system)
   (declare (ignore folder file system))
