@@ -5,15 +5,21 @@
 
 (defvar *templates* (make-hash-table :test #'equal))
 
-(defmacro deftemplate (fn-name vars template &body args)
-  `(progn
-     (setf (gethash ,template *templates*) (djula:compile-template* ,template))
-     (defun ,fn-name ,vars
-       (declare (ignorable ,@vars))
-       (djula:render-template* (gethash ,template *templates*) nil ,@args))))
+(defmacro deftemplate (template vars &body args)
+  (let ((tmpl (gensym)))
+    `(let ((,tmpl ,(string-downcase (symbol-name template))))
+       (setf
+        (gethash ,tmpl *templates*)
+        (list
+         :compiled-template (djula:compile-template* ,tmpl)
+         :lambda (lambda ,vars
+                   (declare (ignorable ,@vars))
+                   (djula:render-template* (getf (gethash ,tmpl *templates*)
+                                                 :compiled-template)
+                                            nil
+                                            ,@args)))))))
 
-(deftemplate control-file (folder file system)
-  "control"
+(deftemplate control (folder file system)
   :name (ql-dist:name system)
   :author (getf file :author)
   :short-description (getf file :description)
@@ -38,25 +44,20 @@
   (format nil "~{ ~A~%~}" (uiop:split-string text :separator "
 ")))
 
-(deftemplate changelog-file (folder file system)
-  "changelog"
+(deftemplate changelog (folder file system)
   :name (ql-dist:name system)
   :version (system-version system)
   :author (getf file :author)
   :date (local-time:to-rfc1123-timestring (local-time:now)))
 
-(deftemplate compat-file (folder file system)
-  "compat")
+(deftemplate compat (folder file system))
 
-(deftemplate copyright-file (folder file system)
-  "copyright"
+(deftemplate copyright (folder file system)
   :mit-license (cl-ppcre:scan "(?i)^mit license$" (getf file :license)))
 
-(deftemplate rules-file (folder file system)
-  "rules")
+(deftemplate rules (folder file system))
 
-(deftemplate install-file (folder file system)
-  "install"
+(deftemplate install (folder file system)
   :lines (format-install-lines system folder))
 
 (defun format-install-lines (system folder)

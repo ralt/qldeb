@@ -22,21 +22,16 @@
                                  (ql-dist:system-file-name system))
                          system-folder)))))
     (ensure-directories-exist debian-folder)
-    ;; TODO: Use (maphash ... *templates*) after
-    ;; fixing *templates*
-    (loop for file in `((,#'control-file . "control")
-                        (,#'changelog-file . "changelog")
-                        (,#'compat-file . "compat")
-                        (,#'copyright-file . "copyright")
-                        (,#'rules-file . "rules")
-                        (,#'install-file . "install"))
-       do (with-open-file (f (merge-pathnames (cdr file) debian-folder)
-                             :direction :output
-                             :if-does-not-exist :create)
-            (format t "rendering ~A~%" (namestring
-                                      (merge-pathnames (cdr file) debian-folder)))
-            (write-sequence (funcall (car file)
-                                     system-folder system-file system) f)))
+    (maphash
+     (lambda (filename template)
+       (with-open-file (f (merge-pathnames filename debian-folder)
+                          :direction :output
+                          :if-does-not-exist :create)
+         (format t "rendering ~A~%" (namestring
+                                     (merge-pathnames filename debian-folder)))
+         (write-sequence (funcall (getf template :lambda)
+                                  system-folder system-file system) f)))
+     *templates*)
     (format t "~A debianized.~%" (ql-dist:name system))))
 
 (defun build-package (env system)
