@@ -51,9 +51,9 @@
 (deftemplate rules-file "rules" (folder file system))
 
 (deftemplate install-file "install" (folder file system)
-  :lines (format-lines system folder))
+  :lines (format-install-lines system folder))
 
-(defun format-lines (system folder)
+(defun format-install-lines (system folder)
   (let ((files nil)
         (folder-namestring-length (length (namestring folder))))
     (fad:walk-directory
