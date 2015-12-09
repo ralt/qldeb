@@ -6,18 +6,17 @@
 (defvar *templates* (make-hash-table :test #'equal))
 
 (defmacro deftemplate (template vars &body args)
-  (let ((tmpl (gensym)))
-    `(let ((,tmpl ,(string-downcase (symbol-name template))))
+  (let ((tmpl (gensym))
+        (compiled-template (gensym)))
+    `(let* ((,tmpl ,(string-downcase (symbol-name template)))
+            (,compiled-template (djula:compile-template* ,tmpl)))
        (setf
         (gethash ,tmpl *templates*)
         (list
-         :compiled-template (djula:compile-template* ,tmpl)
+         :compiled-template ,compiled-template
          :lambda (lambda ,vars
                    (declare (ignorable ,@vars))
-                   (djula:render-template* (getf (gethash ,tmpl *templates*)
-                                                 :compiled-template)
-                                            nil
-                                            ,@args)))))))
+                   (djula:render-template* ,compiled-template nil ,@args)))))))
 
 (deftemplate control (folder file system)
   :name (ql-dist:name system)
