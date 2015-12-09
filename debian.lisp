@@ -22,6 +22,8 @@
                                  (ql-dist:system-file-name system))
                          system-folder)))))
     (ensure-directories-exist debian-folder)
+    ;; TODO: Use (maphash ... *templates*) after
+    ;; fixing *templates*
     (loop for file in `((,#'control-file . "control")
                         (,#'changelog-file . "changelog")
                         (,#'compat-file . "compat")
