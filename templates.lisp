@@ -8,10 +8,13 @@
 (dolist (file '("control" "changelog" "compat" "copyright" "rules" "install"))
   (setf (gethash file *templates*) (djula:compile-template* file)))
 
+(defmacro render (template &body body)
+  `(djula:render-template* (gethash ,template *templates*) nil
+                           ,@body))
+
 (defun control-file (folder file system)
   (declare (ignore folder))
-  (djula:render-template*
-   (gethash "control" *templates*) nil
+  (render "control"
    :name (ql-dist:name system)
    :author (getf file :author)
    :short-description (getf file :description)
@@ -38,8 +41,7 @@
 
 (defun changelog-file (folder file system)
   (declare (ignore folder))
-  (djula:render-template*
-   (gethash "changelog" *templates*) nil
+  (render "changelog"
    :name (ql-dist:name system)
    :version (system-version system)
    :author (getf file :author)
@@ -47,22 +49,20 @@
 
 (defun compat-file (folder file system)
   (declare (ignore folder file system))
-  (djula:render-template* (gethash "compat" *templates*) nil))
+  (render "compat"))
 
 (defun copyright-file (folder file system)
   (declare (ignore folder system))
-  (djula:render-template*
-   (gethash "copyright" *templates*) nil
+  (render "copyright"
    :mit-license (cl-ppcre:scan "(?i)^mit license$" (getf file :license))))
 
 (defun rules-file (folder file system)
   (declare (ignore folder file system))
-  (djula:render-template* (gethash "rules" *templates*) nil))
+  (render "rules"))
 
 (defun install-file (folder file system)
   (declare (ignore file))
-  (djla:render-template*
-   (gethash "install" *templates*) nil
+  (render "install"
    :lines (format-lines system folder)))
 
 (defun format-lines (system folder)
