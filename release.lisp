@@ -1,28 +1,15 @@
 (in-package #:qldeb)
 
-(defun releases-objects (dist)
-  ;;; Returns a list built like this:
-  ;;; ((<QL-DIST:RELEASE {1}> (<QL-DIST:SYSTEM {1a}> <QL-DIST:SYSTEM {1b}> ...))
-  ;;;  (<QL-DIST:RELEASE {2}> (<QL-DIST:SYSTEM {2a}> <QL-DIST:SYSTEM {2b}> ...)))
-  (loop for release in (ql-dist:provided-releases dist)
-     collect (cons release (list (find-systems dist release)))))
-
-(defun find-systems (dist release)
-  (remove-if-not (lambda (systems)
-                   (equal (ql-dist:release systems) release))
-                 (ql-dist:provided-systems dist)))
-
 (defun archive-name (release)
   (pathname
    (first
     (last
      (uiop:split-string (ql-dist:archive-url release) :separator "/")))))
 
-(defun install-release (env release-object)
-  (multiple-value-prog1 (second release-object)
-    (let* ((release (first release-object))
-           (archive-url (ql-dist:archive-url release))
-           (name (archive-name release)))
+(defun install-release (env release)
+  (multiple-value-prog1 (ql-dist:provided-systems release)
+    (let ((archive-url (ql-dist:archive-url release))
+          (name (archive-name release)))
       (download-release (merge-pathnames name env) archive-url)
       (extract-release env name))))
 
