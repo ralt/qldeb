@@ -3,7 +3,7 @@
 (defmacro with-chroot (var &body body)
   (let ((temp (gensym)))
     `(let ((,temp (pathname (uiop:strcat (sb-posix:mkdtemp "/tmp/qldeb.XXXXXX") "/"))))
-       (format t "Creating cdebootstrap environment~%")
+       (format t "Creating cdebootstrap environment in ~A~%" ,temp)
        (uiop:run-program
         (format nil "cdebootstrap \\
 --arch=amd64 \\
