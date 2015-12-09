@@ -6,8 +6,10 @@
   (copy-package env system))
 
 (defun debianize-system (env system)
-  "Debianizing a system is just creating the debian/ folder and
-put some generated files in there."
+  "
+  Debianizing a system is just creating the debian/ folder and
+  putting some generated files in there.
+  "
   (let* ((system-folder (merge-pathnames
                          (uiop:strcat (ql-dist:prefix system) "/")
                          (merge-pathnames #p"root/common-lisp/" env)))
@@ -26,7 +28,8 @@ put some generated files in there."
   (uiop:chdir (merge-pathnames
                (uiop:strcat (ql-dist:prefix system) "/")
                (merge-pathnames #p"root/common-lisp/" env)))
-  ;; Don't sign the packages for now.
+  ;; Don't sign the packages for now. We don't
+  ;; yet know how to handle gpg prompt.
   (uiop:run-program "dpkg-buildpackage -us -uc"))
 
 (defun copy-package (env system)
@@ -39,11 +42,7 @@ put some generated files in there."
   (let ((name (ql-dist:name system))
         (version (ql-dist:version (ql-dist:dist system))))
     (list
-     ;; .deb
      (format nil "~A_~A_amd64.deb" name version)
-     ;; .changes
      (format nil "~A_~A_amd64.changes" name version)
-     ;; .dsc
      (format nil "~A_~A.dsc" name version)
-     ;; .tar.xz
      (format nil "~A_~A.tar.xz" name version))))
