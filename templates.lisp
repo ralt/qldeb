@@ -15,11 +15,11 @@
    :name (ql-dist:name system)
    :author (getf file :author)
    :short-description (getf file :description)
-   (when (getf file :long-description)
-     :long-description (format-long-description
+   :long-description (when (getf file :long-description)
+                       (format-long-description
                         (getf file :long-description)))
-   (when (ql-dist:required-systems system)
-     :dependencies (format-dependencies
+   :dependencies (when (ql-dist:required-systems system)
+                   (format-dependencies
                     system
                     (ql-dist:required-systems system)))))
 
