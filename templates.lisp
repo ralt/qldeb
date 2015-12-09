@@ -33,7 +33,7 @@
           dependencies))
 
 (defun format-long-description (text)
-  (format nil "~{ ~A~%~}~%" (uiop:split-string text :separator "
+  (format nil "~{ ~A~%~}" (uiop:split-string text :separator "
 ")))
 
 (defun changelog-file (folder file system)
@@ -66,4 +66,19 @@
    (gethash "install" *templates*) nil
    :lines (format-lines system folder)))
 
-(defun format-lines (system folder))
+(defun format-lines (system folder)
+  (let ((files nil)
+        (folder-namestring-length (length (namestring folder))))
+    (fad:walk-directory
+     folder
+     (lambda (file)
+       (push
+        ;; Relative path
+        (subseq (namestring file)
+                folder-namestring-length)
+        files)))
+    (format nil "~{~A~%~}"
+            (mapcar (lambda (file)
+                      (format nil "~A /usr/share/common-lisp/source/~A/~A"
+                              file (ql-dist:name system) file))
+                    files))))

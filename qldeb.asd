@@ -11,7 +11,8 @@
                :ironclad
                :djula
                :local-time
-               :cl-ppcre)
+               :cl-ppcre
+               :cl-fad)
   :components ((:file "package")
                (:file "release")
                (:file "templates")
