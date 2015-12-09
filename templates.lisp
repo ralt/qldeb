@@ -5,25 +5,24 @@
 
 (defvar *templates* (make-hash-table :test #'equal))
 
-(dolist (file '("control" "changelog" "compat" "copyright" "rules" "install"))
-  (setf (gethash file *templates*) (djula:compile-template* file)))
+(defmacro deftemplate (fn-name template vars &body args)
+  `(progn
+     (setf (gethash ,template *templates*) (djula:compile-template* ,template))
+     (defun ,fn-name ,vars
+       (declare (ignorable ,@vars))
+       (djula:render-template* ,template nil ,@args))))
 
-(defun render (template &rest args)
-  (apply #'djula:render-template* template nil args))
-
-(defun control-file (folder file system)
-  (declare (ignore folder))
-  (render "control"
-   :name (ql-dist:name system)
-   :author (getf file :author)
-   :short-description (getf file :description)
-   :long-description (when (getf file :long-description)
-                       (format-long-description
-                        (getf file :long-description)))
-   :dependencies (when (ql-dist:required-systems system)
-                   (format-dependencies
-                    system
-                    (ql-dist:required-systems system)))))
+(deftemplate control-file "control" (folder file system)
+  :name (ql-dist:name system)
+  :author (getf file :author)
+  :short-description (getf file :description)
+  :long-description (when (getf file :long-description)
+                      (format-long-description
+                       (getf file :long-description)))
+  :dependencies (when (ql-dist:required-systems system)
+                  (format-dependencies
+                   system
+                   (ql-dist:required-systems system))))
 
 (defun format-dependencies (system dependencies)
   (mapcar (lambda (dependency)
@@ -38,31 +37,21 @@
   (format nil "~{ ~A~%~}" (uiop:split-string text :separator "
 ")))
 
-(defun changelog-file (folder file system)
-  (declare (ignore folder))
-  (render "changelog"
-   :name (ql-dist:name system)
-   :version (system-version system)
-   :author (getf file :author)
-   :date (local-time:to-rfc1123-timestring (local-time:now))))
+(deftemplate changelog-file "changelog" (folder file system)
+  :name (ql-dist:name system)
+  :version (system-version system)
+  :author (getf file :author)
+  :date (local-time:to-rfc1123-timestring (local-time:now)))
 
-(defun compat-file (folder file system)
-  (declare (ignore folder file system))
-  (render "compat"))
+(deftemplate compat-file "compat" (folder file system))
 
-(defun copyright-file (folder file system)
-  (declare (ignore folder system))
-  (render "copyright"
-   :mit-license (cl-ppcre:scan "(?i)^mit license$" (getf file :license))))
+(deftemplate copyright-file "copyright" (folder file system)
+  :mit-license (cl-ppcre:scan "(?i)^mit license$" (getf file :license)))
 
-(defun rules-file (folder file system)
-  (declare (ignore folder file system))
-  (render "rules"))
+(deftemplate rules-file "rules" (folder file system))
 
-(defun install-file (folder file system)
-  (declare (ignore file))
-  (render "install"
-   :lines (format-lines system folder)))
+(deftemplate install-file "install" (folder file system)
+  :lines (format-lines system folder))
 
 (defun format-lines (system folder)
   (let ((files nil)
