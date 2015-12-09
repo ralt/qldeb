@@ -36,20 +36,14 @@ put some generated files in there."
                  file)))
 
 (defun package-files (system)
-  (list
-   ;; .deb
-   (uiop:strcat (ql-dist:project-name system)
-                "_" (ql-dist:version (ql-dist:dist system))
-                "_amd64.deb")
-   ;;; .changes
-   (uiop:strcat (ql-dist:project-name system)
-                "_" (ql-dist:version (ql-dist:dist system))
-                "_amd64.changes")
-   ;;; .dsc
-   (uiop:strcat (ql-dist:project-name system)
-                "_" (ql-dist:version (ql-dist:dist system))
-                ".dsc")
-   ;;; .tar.xz
-   (uiop:strcat (ql-dist:project-name system)
-                "_" (ql-dist:version (ql-dist:dist system))
-                ".tar.xz")))
+  (let ((name (ql-dist:name system))
+        (version (ql-dist:version (ql-dist:dist system))))
+    (list
+     ;; .deb
+     (format nil "~A_~A_amd64.deb" name version)
+     ;; .changes
+     (format nil "~A_~A_amd64.changes" name version)
+     ;; .dsc
+     (format nil "~A_~A.dsc" name version)
+     ;; .tar.xz
+     (format nil "~A_~A.tar.xz" name version))))
