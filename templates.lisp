@@ -5,14 +5,15 @@
 
 (defvar *templates* (make-hash-table :test #'equal))
 
-(defmacro deftemplate (fn-name template vars &body args)
+(defmacro deftemplate (fn-name vars template &body args)
   `(progn
      (setf (gethash ,template *templates*) (djula:compile-template* ,template))
      (defun ,fn-name ,vars
        (declare (ignorable ,@vars))
        (djula:render-template* ,template nil ,@args))))
 
-(deftemplate control-file "control" (folder file system)
+(deftemplate control-file (folder file system)
+  "control"
   :name (ql-dist:name system)
   :author (getf file :author)
   :short-description (getf file :description)
@@ -37,20 +38,25 @@
   (format nil "~{ ~A~%~}" (uiop:split-string text :separator "
 ")))
 
-(deftemplate changelog-file "changelog" (folder file system)
+(deftemplate changelog-file (folder file system)
+  "changelog"
   :name (ql-dist:name system)
   :version (system-version system)
   :author (getf file :author)
   :date (local-time:to-rfc1123-timestring (local-time:now)))
 
-(deftemplate compat-file "compat" (folder file system))
+(deftemplate compat-file (folder file system)
+  "compat")
 
-(deftemplate copyright-file "copyright" (folder file system)
+(deftemplate copyright-file (folder file system)
+  "copyright"
   :mit-license (cl-ppcre:scan "(?i)^mit license$" (getf file :license)))
 
-(deftemplate rules-file "rules" (folder file system))
+(deftemplate rules-file (folder file system)
+  "rules")
 
-(deftemplate install-file "install" (folder file system)
+(deftemplate install-file (folder file system)
+  "install"
   :lines (format-install-lines system folder))
 
 (defun format-install-lines (system folder)
