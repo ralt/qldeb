@@ -76,8 +76,7 @@
         (subseq (namestring file)
                 folder-namestring-length)
         files)))
-    (format nil "~{~A~%~}"
-            (mapcar (lambda (file)
-                      (format nil "~A /usr/share/common-lisp/source/~A/~A"
-                              file (ql-dist:name system) file))
-                    files))))
+    (mapcar (lambda (file)
+              (format nil "~A /usr/share/common-lisp/source/~A/~A"
+                      file (ql-dist:name system) file))
+            files)))
