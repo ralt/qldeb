@@ -10,7 +10,7 @@
      (setf (gethash ,template *templates*) (djula:compile-template* ,template))
      (defun ,fn-name ,vars
        (declare (ignorable ,@vars))
-       (djula:render-template* ,template nil ,@args))))
+       (djula:render-template* (gethash ,template *templates*) nil ,@args))))
 
 (deftemplate control-file (folder file system)
   "control"
