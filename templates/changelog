@@ -1,7 +1,5 @@
-{% for entry in entries %}{{ name }} ({{ entry.version }}) unstable; urgency=medium
+{{ name }} ({{ version }}) unstable; urgency=medium
 
-{{ entry.message }}
+  * qldeb-generated {{ name }} from Quicklisp {{ version }}
 
- -- {{ entry.author|safe }}  {{ entry.date }}
-
-{% endfor %}
+ -- {{ author|safe }}  {{ date }}

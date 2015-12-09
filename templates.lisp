@@ -35,7 +35,13 @@
   (format nil "~{ ~A~%~}~%" (uiop:split-string text :separator "
 ")))
 
-(defun changelog-file (system-file system))
+(defun changelog-file (system-file system)
+  (djula:render-template*
+   (gethash "changelog" *templates*) nil
+   :name (ql-dist:name system)
+   :version (system-version system)
+   :author (getf system-file :author)
+   :date (local-time:to-rfc1123-timestring (local-time:now))))
 
 (defun compat-file (system-file system)
   (declare (ignore system-file system))
