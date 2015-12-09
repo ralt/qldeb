@@ -14,7 +14,7 @@
   (multiple-value-prog1 (ql-dist:provided-systems release)
     (let ((archive-url (ql-dist:archive-url release))
           (name (archive-name release)))
-      (download-release release (merge-pathnames name env) archive-url)
+      (download-release env release (merge-pathnames name env) archive-url)
       (extract-release env name))))
 
 (defun extract-release (env name)
@@ -23,7 +23,7 @@
            (merge-pathnames name env)
            (merge-pathnames name #p"/root/common-lisp/"))))
 
-(defun download-release (release path url)
+(defun download-release (env release path url)
   (with-open-file (f path
                      :direction :output
                      :element-type '(unsigned-byte 8)
@@ -32,7 +32,7 @@
     (let ((archive (drakma:http-request url :force-binary t)))
       (unless (check-archive release archive)
         (format t "~A corrupted, trying again...~%" (namestring path))
-        (return-from download-release (download-release env release-object)))
+        (return-from download-release (download-release env release path url)))
       (write-sequence archive f)
       (format t "~A is downloaded to ~A~%" url (namestring path)))))
 
