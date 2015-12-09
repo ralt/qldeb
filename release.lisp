@@ -1,5 +1,9 @@
 (in-package #:qldeb)
 
+(defun system-version (system)
+  (format nil "~{~A~}" (uiop:split-string (ql-dist:version (ql-dist:dist system))
+                                          :separator "-")))
+
 (defun archive-name (release)
   (pathname
    (first

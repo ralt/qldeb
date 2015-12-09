@@ -13,7 +13,13 @@
   (let* ((system-folder (merge-pathnames
                          (uiop:strcat (ql-dist:prefix system) "/")
                          (merge-pathnames #p"root/common-lisp/" env)))
-         (debian-folder (merge-pathnames #p"debian/" system-folder)))
+         (debian-folder (merge-pathnames #p"debian/" system-folder))
+         (system-file (read-from-string
+                       (uiop:read-file-string
+                        (merge-pathnames
+                         (format nil "~A.asd"
+                                 (ql-dist:system-file-name system))
+                         system-folder)))))
     (loop for file in `((,#'control-file . "control")
                         (,#'changelog-file . "changelog")
                         (,#'compat-file . "compat")
@@ -22,7 +28,7 @@
        do (with-open-file (f (merge-pathnames (cdr file) debian-folder)
                              :direction :output
                              :if-does-not-exist :create)
-            (write-sequence (funcall (car file) system) f)))))
+            (write-sequence (funcall (car file) system-file system) f)))))
 
 (defun build-package (env system)
   (uiop:chdir (merge-pathnames
@@ -40,7 +46,7 @@
 
 (defun package-files (system)
   (let ((name (ql-dist:name system))
-        (version (ql-dist:version (ql-dist:dist system))))
+        (version (system-version system)))
     (list
      (format nil "~A_~A_amd64.deb" name version)
      (format nil "~A_~A_amd64.changes" name version)
