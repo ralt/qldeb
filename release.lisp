@@ -20,8 +20,8 @@
 (defun extract-release (env name)
   (uiop:run-program
    (format nil "tar xf ~A -C ~A"
-           (merge-pathnames name env)
-           (merge-pathnames name #p"/root/common-lisp/"))))
+           (namestring (merge-pathnames name env))
+           (namestring #p"/root/common-lisp/"))))
 
 (defun download-release (env release path url)
   (format t "downloading ~A...~%" url)
