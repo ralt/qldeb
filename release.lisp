@@ -37,15 +37,15 @@
     (format t "~A is downloaded to ~A~%" url (namestring path))))
 
 (defun check-archive (release archive)
-  (and (check-archive-sha1 (ql-dist:archive-content-sha1 release) archive)
+  (and (check-archive-md5 (ql-dist::archive-md5 release) archive)
        (check-archive-size (ql-dist:archive-size release) archive)))
 
 (defun sum (digest value)
   (ironclad:byte-array-to-hex-string
    (ironclad:digest-sequence digest value)))
 
-(defun check-archive-sha1 (sum archive)
-  (string= sum (sum :sha1 archive)))
+(defun check-archive-md5 (sum archive)
+  (string= sum (sum :md5 archive)))
 
 (defun check-archive-size (size archive)
   (= (length archive) size))
