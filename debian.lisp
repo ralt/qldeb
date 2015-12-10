@@ -5,6 +5,12 @@
   (build-package env system)
   (copy-package env system))
 
+(defun get-asd-form (system forms)
+  (find-if (lambda (form)
+             (string= (ql-dist:name system)
+                      (string-downcase (symbol-name (second form)))))
+           forms))
+
 (defun debianize-system (env system)
   "
   Debianizing a system is just creating the debian/ folder and
@@ -15,12 +21,11 @@
                          (uiop:strcat (ql-dist:prefix system) "/")
                          (merge-pathnames #p"root/common-lisp/" env)))
          (debian-folder (merge-pathnames #p"debian/" system-folder))
-         (system-file (read-from-string
-                       (uiop:read-file-string
-                        (merge-pathnames
-                         (format nil "~A.asd"
-                                 (ql-dist:system-file-name system))
-                         system-folder)))))
+         (system-file (get-asd-form system
+                                    (merge-pathnames
+                                     (format nil "~A.asd"
+                                             (ql-dist:system-file-name system))
+                                     system-folder))))
     (ensure-directories-exist debian-folder)
     (maphash
      (lambda (filename template)
