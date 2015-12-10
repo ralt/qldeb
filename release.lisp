@@ -11,11 +11,12 @@
      (uiop:split-string (ql-dist:archive-url release) :separator "/")))))
 
 (defun install-release (env release)
-  (multiple-value-prog1 (ql-dist:provided-systems release)
-    (let ((archive-url (ql-dist:archive-url release))
-          (name (archive-name release)))
-      (download-release env release (merge-pathnames name env) archive-url)
-      (extract-release env name))))
+  (let ((archive-url (ql-dist:archive-url release))
+        (name (archive-name release)))
+    (download-release env release (merge-pathnames name env) archive-url)
+    (extract-release env name)
+    ;; What's the best way to get the list of systems?
+    ))
 
 (defun extract-release (env name)
   (uiop:run-program
