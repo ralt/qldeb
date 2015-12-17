@@ -1,37 +1,38 @@
 (in-package #:qldeb)
 
-(defmacro with-chroot (var &body body)
+(defmacro with-temp (var &body body)
   (let ((temp (gensym)))
     `(let ((,temp (pathname (uiop:strcat (sb-posix:mkdtemp "/tmp/qldeb.XXXXXX") "/"))))
-       (format t "Creating cdebootstrap environment in ~A~%" ,temp)
-       (uiop:run-program
-        (format nil "cdebootstrap \\
---arch=amd64 \\
---flavour=build \\
---include=devscripts \\
-debian/jessie \\
-~A \\
-http://httpredir.debian.org/debian" (namestring ,temp)))
        (let ((,@var ,temp))
          ,@body)
-       (format t "Deleting cdebootstrap environment~%")
        (uiop:delete-directory-tree ,temp :validate t))))
 
 (defun main (args)
   (declare (ignore args))
-  (unless (= (sb-posix:geteuid) 0)
-    (format t "you're not root, go away~%")
-    (uiop:quit -1))
   (setf lparallel:*kernel* (lparallel:make-kernel (* 2 (cpu-count))))
-  (with-chroot (env)
-    (let ((channel (lparallel:make-channel)))
-      (dolist (release (ql-dist:provided-releases (ql-dist:find-dist "quicklisp")))
-        (lparallel:submit-task channel #'install-release
-                               env release))
-      (loop for systems in (lparallel:receive-result channel)
-         do (mapcar (lambda (system)
-                      (build-debian-package env system))
-                    systems)))))
+  (with-temp (env)
+    (let ((releases-channel (lparallel:make-channel))
+          (builds-channel (lparallel:make-channel))
+          (dist (ql-dist:find-dist "quicklisp")))
+      (dolist (release (subseq (ql-dist:provided-releases dist) 0 10))
+        (lparallel:submit-task releases-channel #'install-release
+                               env release (find-systems dist release)))
+      (dotimes (i 10)
+        (declare (ignore i))
+        (lparallel:submit-task builds-channel
+                               (lambda (systems)
+                                 (dolist (system systems)
+                                   (build-debian-package env system)))
+                               (lparallel:receive-result releases-channel)))
+      ;; Just wait for the builds to be done
+      (dotimes (i 10)
+        (declare (ignore i))
+        (lparallel:receive-result builds-channel)))))
+
+(defun find-systems (dist release)
+  (remove-if-not (lambda (system)
+                   (eq (ql-dist:release system) release))
+                 (ql-dist:provided-systems dist)))
 
 ;;; Copy pasted from sb-cpu-affinity
 (defun cpu-count ()

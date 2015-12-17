@@ -8,6 +8,6 @@ Standards-Version: 3.9.6
 Package: {{ name }}
 Architecture: amd64
 Depends: common-lisp-controller{% if dependencies %},
- {{ dependencies|join:", " }}{% endif %}
+ {{ dependencies|safe|join:", " }}{% endif %}
 Description: {{ short-description }}
 {% if long-description %}{{ long-description }} {% endif %}

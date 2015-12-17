@@ -10,19 +10,20 @@
     (last
      (uiop:split-string (ql-dist:archive-url release) :separator "/")))))
 
-(defun install-release (env release)
-  (let ((archive-url (ql-dist:archive-url release))
-        (name (archive-name release)))
-    (download-release env release (merge-pathnames name env) archive-url)
-    (extract-release env name)
-    ;; What's the best way to get the list of systems?
-    ))
+(defun install-release (env release systems)
+  (multiple-value-prog1 systems
+    (let ((archive-url (ql-dist:archive-url release))
+          (name (archive-name release)))
+      (download-release env release (merge-pathnames name env) archive-url)
+      (extract-release env name))))
 
 (defun extract-release (env name)
+  (format t "extracting ~A...~%" name)
   (uiop:run-program
    (format nil "tar xf ~A -C ~A"
            (namestring (merge-pathnames name env))
-           (namestring #p"/root/common-lisp/"))))
+           (namestring env)))
+  (format t "~A extracted~%" name))
 
 (defun download-release (env release path url)
   (format t "downloading ~A...~%" url)

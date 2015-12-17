@@ -18,13 +18,27 @@
                    (declare (ignorable ,@vars))
                    (djula:render-template* ,compiled-template nil ,@args)))))))
 
-(deftemplate control (folder file system)
+(defvar *dummy-author-email* "dummy@author.com")
+(defvar *dummy-author* (format nil "Dummy author <~A>" *dummy-author-email*))
+(defvar *dummy-description* "Dummy short description")
+
+(defun author (form)
+  (if (getf form :author)
+      (validated-author (getf form :author))
+      *dummy-author*))
+
+(defun validated-author (author)
+  (if (ppcre:scan ".+<.+>" author)
+      author
+      (format nil "~A <~A>" author *dummy-author-email*)))
+
+(deftemplate control (folder form system)
   :name (ql-dist:name system)
-  :author (getf file :author)
-  :short-description (getf file :description)
-  :long-description (when (getf file :long-description)
+  :author (author form)
+  :short-description (or (getf form :description) *dummy-description*)
+  :long-description (when (getf form :long-description)
                       (format-long-description
-                       (getf file :long-description)))
+                       (getf form :long-description)))
   :dependencies (when (ql-dist:required-systems system)
                   (format-dependencies
                    system
@@ -40,23 +54,24 @@
           dependencies))
 
 (defun format-long-description (text)
-  (format nil "~{ ~A~%~}" (uiop:split-string text :separator "
-")))
+  (let ((scanner (ppcre:create-scanner "^[ ]*$" :multi-line-mode t)))
+    (ppcre:regex-replace-all scanner (format nil "~{ ~A~%~}" (uiop:split-string text :separator "
+")) " .")))
 
-(deftemplate changelog (folder file system)
+(deftemplate changelog (folder form system)
   :name (ql-dist:name system)
   :version (system-version system)
-  :author (getf file :author)
+  :author (author form)
   :date (local-time:to-rfc1123-timestring (local-time:now)))
 
-(deftemplate compat (folder file system))
+(deftemplate compat (folder form system))
 
-(deftemplate copyright (folder file system)
-  :mit-license (cl-ppcre:scan "(?i)^mit license$" (getf file :license)))
+(deftemplate copyright (folder form system)
+  :mit-license (cl-ppcre:scan "(?i)^mit license$" (getf form :license)))
 
-(deftemplate rules (folder file system))
+(deftemplate rules (folder form system))
 
-(deftemplate install (folder file system)
+(deftemplate install (folder form system)
   :lines (format-install-lines system folder))
 
 (defun format-install-lines (system folder)
@@ -71,6 +86,6 @@
                 folder-namestring-length)
         files)))
     (mapcar (lambda (file)
-              (format nil "~A /usr/share/common-lisp/source/~A/~A"
-                      file (ql-dist:name system) file))
+              (format nil "~A /usr/share/common-lisp/source/~A/"
+                      file (ql-dist:name system)))
             files)))
