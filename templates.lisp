@@ -86,6 +86,7 @@
                 folder-namestring-length)
         files)))
     (mapcar (lambda (file)
-              (format nil "~A /usr/share/common-lisp/source/~A/"
-                      file (ql-dist:name system)))
+              (format nil "~A /usr/share/common-lisp/source/~A/~A"
+                      file (ql-dist:name system)
+                      (uiop:pathname-directory-pathname file)))
             files)))
