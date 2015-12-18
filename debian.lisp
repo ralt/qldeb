@@ -1,9 +1,9 @@
 (in-package #:qldeb)
 
-(defun build-debian-package (env system)
+(defun build-debian-package (env system cwd)
   (debianize-system env system)
   (build-package env system)
-  (copy-package env system))
+  (copy-package env system cwd))
 
 (defun get-asd-form (system asd-file)
   "
@@ -61,11 +61,11 @@
   (uiop:run-program "dpkg-buildpackage -us -uc -Zgzip")
   (format t "~A debian package built.~%" (ql-dist:name system)))
 
-(defun copy-package (env system)
+(defun copy-package (env system cwd)
   (dolist (dest (package-files system))
     (let ((source (merge-pathnames dest env)))
-      (format t "moving ~A to ~A~%" source dest)
-      (rename-file source dest))))
+      (format t "moving ~A to ~A~%" source (merge-pathnames dest cwd))
+      (rename-file source (merge-pathnames dest cwd)))))
 
 (defun package-files (system)
   (let ((name (ql-dist:name system))

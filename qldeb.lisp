@@ -14,7 +14,8 @@
     (let* ((releases-channel (lparallel:make-channel))
            (builds-channel (lparallel:make-channel))
            (dist (ql-dist:find-dist "quicklisp"))
-           (releases (ql-dist:provided-releases dist)))
+           (releases (ql-dist:provided-releases dist))
+           (cwd (uiop:getcwd)))
       (dolist (release releases)
         (lparallel:submit-task releases-channel #'install-release
                                env release (find-systems dist release)))
@@ -23,7 +24,7 @@
         (lparallel:submit-task builds-channel
                                (lambda (systems)
                                  (dolist (system systems)
-                                   (build-debian-package env system)))
+                                   (build-debian-package env system cwd)))
                                (lparallel:receive-result releases-channel)))
       ;; Just wait for the builds to be done
       (dotimes (i (length releases))
