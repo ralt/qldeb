@@ -52,16 +52,14 @@
     (format t "~A debianized.~%" (ql-dist:name system))))
 
 (defun build-package (env system)
-  (let ((cwd (uiop:getcwd)))
-    (format t "building ~A...~%" (ql-dist:name system))
-    (uiop:chdir (merge-pathnames
-                 (uiop:strcat (ql-dist:prefix (ql-dist:release system)) "/")
-                 env))
-    ;; Don't sign the packages for now. We don't
-    ;; yet know how to handle gpg prompt.
-    (uiop:run-program "dpkg-buildpackage -us -uc -Zgzip")
-    (format t "~A debian package built.~%" (ql-dist:name system))
-    (uiop:chdir cwd)))
+  (format t "building ~A...~%" (ql-dist:name system))
+  (uiop:chdir (merge-pathnames
+               (uiop:strcat (ql-dist:prefix (ql-dist:release system)) "/")
+               env))
+  ;; Don't sign the packages for now. We don't
+  ;; yet know how to handle gpg prompt.
+  (uiop:run-program "dpkg-buildpackage -us -uc -Zgzip")
+  (format t "~A debian package built.~%" (ql-dist:name system)))
 
 (defun copy-package (env system)
   (dolist (dest (package-files system))
