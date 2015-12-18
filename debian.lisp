@@ -1,9 +1,12 @@
 (in-package #:qldeb)
 
 (defun build-debian-package (env system cwd)
-  (debianize-system env system)
-  (build-package env system)
-  (copy-package env system cwd))
+  (handler-case
+      (progn
+        (debianize-system env system)
+        (build-package env system)
+        (copy-package env system cwd))
+    (error (err) (format *error-output* "~A" err))))
 
 (defun get-asd-form (system asd-file)
   "
