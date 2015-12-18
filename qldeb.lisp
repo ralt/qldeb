@@ -18,7 +18,7 @@
       (dolist (release releases)
         (lparallel:submit-task releases-channel #'install-release
                                env release (find-systems dist release)))
-      (dotimes (i (1- (length releases)))
+      (dotimes (i (length releases))
         (declare (ignore i))
         (lparallel:submit-task builds-channel
                                (lambda (systems)
@@ -26,7 +26,7 @@
                                    (build-debian-package env system)))
                                (lparallel:receive-result releases-channel)))
       ;; Just wait for the builds to be done
-      (dotimes (i (1- (length releases)))
+      (dotimes (i (length releases))
         (declare (ignore i))
         (lparallel:receive-result builds-channel)))))
 
