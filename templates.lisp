@@ -80,11 +80,11 @@
     (fad:walk-directory
      folder
      (lambda (file)
-       (push
-        ;; Relative path
-        (subseq (namestring file)
-                folder-namestring-length)
-        files)))
+       (let ((relative-path (subseq (namestring file) folder-namestring-length)))
+         ;; Don't copy debian files
+         (unless (string= (namestring (uiop:pathname-directory-pathname relative-path))
+                          "debian/")
+           (push relative-path files)))))
     (mapcar (lambda (file)
               (format nil "~A /usr/share/common-lisp/source/~A/~A"
                       file (ql-dist:name system)
