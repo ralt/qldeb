@@ -1,5 +1,0 @@
-{{ name }} ({{ version }}) unstable; urgency=medium
-
-  * qldeb-generated {{ name }} from Quicklisp {{ version }}
-
- -- {{ author|safe }}  {{ date }}

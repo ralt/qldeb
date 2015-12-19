@@ -7,14 +7,12 @@
                :drakma
                :quicklisp
                :uiop
-               :sb-posix
                :ironclad
-               :djula
                :local-time
                :cl-ppcre
-               :cl-fad)
+               :archive
+               :deb-packager)
   :components ((:file "package")
+               (:file "debian-package")
                (:file "release")
-               (:file "templates")
-               (:file "debian")
                (:file "qldeb")))

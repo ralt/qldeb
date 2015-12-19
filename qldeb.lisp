@@ -1,40 +1,21 @@
 (in-package #:qldeb)
 
-(defmacro with-temp (var &body body)
-  (let ((temp (gensym)))
-    `(let ((,temp (pathname (uiop:strcat (sb-posix:mkdtemp "/tmp/qldeb.XXXXXX") "/"))))
-       (let ((,@var ,temp))
-         ,@body)
-       (uiop:delete-directory-tree ,temp :validate t))))
-
 (defun main (args)
   (declare (ignore args))
   (setf lparallel:*kernel* (lparallel:make-kernel (* 2 (cpu-count))))
-  (with-temp (env)
-    (let* ((releases-channel (lparallel:make-channel))
-           (builds-channel (lparallel:make-channel))
-           (dist (ql-dist:find-dist "quicklisp"))
-           (releases (ql-dist:provided-releases dist))
-           (cwd (uiop:getcwd)))
-      (dolist (release releases)
-        (lparallel:submit-task releases-channel #'install-release
-                               env release (find-systems dist release)))
-      (dotimes (i (length releases))
-        (declare (ignore i))
-        (lparallel:submit-task builds-channel
-                               (lambda (systems)
-                                 (dolist (system systems)
-                                   (build-debian-package env system cwd)))
-                               (lparallel:receive-result releases-channel)))
-      ;; Just wait for the builds to be done
-      (dotimes (i (length releases))
-        (declare (ignore i))
-        (lparallel:receive-result builds-channel)))))
+  (let* ((channel (lparallel:make-channel))
+         (dist (ql-dist:find-dist "quicklisp"))
+         (releases (ql-dist:provided-releases dist)))
+    (submit-tasks channel #'download-and-package releases)
+    (wait-for-tasks channel (length releases))))
 
-(defun find-systems (dist release)
-  (remove-if-not (lambda (system)
-                   (eq (ql-dist:release system) release))
-                 (ql-dist:provided-systems dist)))
+(defun submit-tasks (channel fn objects)
+  (dolist (object objects)
+    (lparallel:submit-task channel fn object)))
+
+(defun wait-for-tasks (channel length)
+  (dotimes (i length)
+    (lparallel:receive-result channel)))
 
 ;;; Copy pasted from sb-cpu-affinity
 (defun cpu-count ()
