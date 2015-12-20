@@ -73,5 +73,9 @@
 
 (defun format-long-description (text)
   (let ((scanner (ppcre:create-scanner "^[ ]*$" :multi-line-mode t)))
-    (ppcre:regex-replace-all scanner (format nil "~{ ~A~%~}" (uiop:split-string text :separator "
-")) " .")))
+    (ppcre:regex-replace-all
+     scanner
+     (format nil "~{ ~A~%~}"
+             (uiop:split-string text :separator "
+"))
+     " .")))
