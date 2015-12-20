@@ -6,10 +6,13 @@
       (format t "building debian package for ~A...~%" (ql-dist:name system))
       (let ((package (make-debian-package archive system)))
         (format t "debian package for ~A built.~%" (ql-dist:name system))
-        (deb-packager:write-deb-file (deb-packager::package-pathname package)
-                                     package)
-        (format t "~A written to disk.~%"
-                (deb-packager::package-pathname package))))))
+        (handler-case
+            (progn
+              (deb-packager:write-deb-file (deb-packager::package-pathname package)
+                                           package)
+              (format t "~A written to disk.~%"
+                      (deb-packager::package-pathname package)))
+          (error (e) (format *error-output* "error writing .deb: ~A" e)))))))
 
 (defun release-systems (release)
   "Fetches all the systems provided by a release."

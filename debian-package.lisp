@@ -6,6 +6,13 @@
                              (flexi-streams:make-in-memory-input-stream
                               (make-array 0 :element-type '(unsigned-byte 8))))))
 
+(defmacro with-targz-archive (vars &body body)
+  `(let ((,(first vars) (archive:open-archive
+                         'archive:tar-archive
+                         (gunzipped-stream ,(second vars)))))
+     (multiple-value-prog1 ,@body
+       (archive:close-archive ,(first vars)))))
+
 (defun gunzipped-stream (sequence)
   (make-instance
    'gzip-input-stream
@@ -13,12 +20,10 @@
                  (coerce sequence '(vector (unsigned-byte 8))))))
 
 (defun make-debian-package (archive-array system)
-  (let* ((archive (archive:open-archive
-                   'archive:tar-archive
-                   (gunzipped-stream archive-array)))
-         (package (make-deb-packager archive system))
-         (data-files (make-data-files archive system)))
+  (let ((package (with-targz-archive (archive archive-array)
+                   (make-deb-packager archive system)))
+        (data-files (with-targz-archive (archive archive-array)
+                      (make-data-files archive system))))
     (multiple-value-prog1 package
       (deb-packager:initialize-control-files package #())
-      (deb-packager:initialize-data-files package data-files)
-      (archive:close-archive archive))))
+      (deb-packager:initialize-data-files package data-files))))
