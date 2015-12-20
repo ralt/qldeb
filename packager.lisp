@@ -1,6 +1,12 @@
 (in-package #:qldeb)
 
-(defun make-deb-packager (archive system release))
+(defun asd-path (release system)
+  (merge-pathnames (uiop:strcat (ql-dist:system-file-name system) ".asd")
+                   (uiop:strcat (ql-dist:prefix release) "/")))
+
+(defun make-deb-packager (archive system release)
+  (let* ((asd-file (read-entry (archive-entry archive (asd-path release system))))
+         (asd-form (read-from-string asd-file)))))
 
 (defvar *dummy-author-email* "dummy@author.com")
 (defvar *dummy-author* (format nil "Dummy author <~A>" *dummy-author-email*))
