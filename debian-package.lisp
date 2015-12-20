@@ -12,12 +12,12 @@
    :understream (flexi-streams:make-in-memory-input-stream
                  (coerce sequence '(vector (unsigned-byte 8))))))
 
-(defun make-debian-package (release archive-array system)
+(defun make-debian-package (archive-array system)
   (let* ((archive (archive:open-archive
                    'archive:tar-archive
                    (gunzipped-stream archive-array)))
-         (package (make-deb-packager archive system release))
-         (data-files (make-data-files archive system release)))
+         (package (make-deb-packager archive system))
+         (data-files (make-data-files archive system)))
     (multiple-value-prog1 package
       (deb-packager:initialize-control-files package #())
       (deb-packager:initialize-data-files package data-files)

@@ -4,7 +4,7 @@
   (let ((archive (download-release release)))
     (dolist (system (release-systems release))
       (format t "building debian package for ~A...~%" (ql-dist:name system))
-      (let ((package (make-debian-package release archive system)))
+      (let ((package (make-debian-package archive system)))
         (format t "debian package for ~A built.~%" (ql-dist:name system))
         (deb-packager:write-deb-file (deb-packager::package-pathname package)
                                      package)

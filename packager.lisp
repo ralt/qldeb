@@ -1,13 +1,13 @@
 (in-package #:qldeb)
 
-(defun asd-path (release system)
+(defun asd-path (system)
   (merge-pathnames (uiop:strcat (ql-dist:system-file-name system) ".asd")
-                   (uiop:strcat (ql-dist:prefix release) "/")))
+                   (uiop:strcat (ql-dist:prefix (ql-dist:release system)) "/")))
 
-(defun make-deb-packager (archive system release)
+(defun make-deb-packager (archive system)
   (let ((asd-form (get-asd-form
                    system
-                   (read-entry (archive-entry archive (asd-path release system))))))
+                   (read-entry (archive-entry archive (asd-path system))))))
     (make-instance
      'deb-packager:deb-package
      :name (make-symbol (ql-dist:name system))
