@@ -9,5 +9,4 @@
       entry)))
 
 (defun read-entry (entry)
-  (let ((stream (flexi-streams:make-flexi-stream (archive:entry-stream entry))))
-    (uiop:slurp-stream-string stream)))
+  (flexi-streams:make-flexi-stream (archive:entry-stream entry)))

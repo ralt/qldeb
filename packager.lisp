@@ -5,8 +5,7 @@
                    (uiop:strcat (ql-dist:prefix release) "/")))
 
 (defun make-deb-packager (archive system release)
-  (let* ((asd-file (read-entry (archive-entry archive (asd-path release system))))
-         (asd-form (read-from-string asd-file)))))
+  (let ((asd (asd-form (read-entry (archive-entry archive (asd-path release system))))))))
 
 (defvar *dummy-author-email* "dummy@author.com")
 (defvar *dummy-author* (format nil "Dummy author <~A>" *dummy-author-email*))
@@ -33,7 +32,7 @@
   (format nil "~{~A~}" (uiop:split-string (ql-dist:version (ql-dist:dist system))
                                           :separator "-")))
 
-(defun get-asd-form (system asd-file)
+(defun get-asd-form (system asd-stream)
   "
   An asd file can have multiple systems in it.
   "
@@ -43,4 +42,4 @@
                (string= (ql-dist:name system)
                         ;; The system name
                         (string-downcase (symbol-name (second form))))))
-           (read-from-string asd-file)))
+           (uiop:slurp-stream-forms asd-stream)))
