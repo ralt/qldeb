@@ -19,7 +19,7 @@
     (let ((archive (drakma:http-request url :force-binary t)))
       (unless (check-archive release archive)
         (format t "~A download corrupted, trying again...~%" url)
-        (return-from download-release (download-release release url)))
+        (return-from download-release (download-release release)))
       (format t "~A's archive is downloaded~%" (ql-dist:project-name release))
       archive)))
 

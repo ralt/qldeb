@@ -11,6 +11,7 @@
                :local-time
                :cl-ppcre
                :archive
+               :gzip-stream
                :deb-packager)
   :components ((:file "package")
                (:file "packager")
