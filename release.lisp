@@ -4,7 +4,12 @@
   (let ((archive (download-release release)))
     (dolist (system (release-systems release))
       (format t "building debian package for ~A...~%" (ql-dist:name system))
-      (let ((package (make-debian-package archive system)))
+      (let ((package (handler-case
+                         (make-debian-package archive system)
+                       (error (e) (progn
+                                    (format *error-output*
+                                            "error generating package: ~A~%" e)
+                                    (return-from download-and-package))))))
         (format t "debian package for ~A built.~%" (ql-dist:name system))
         (handler-case
             (progn
@@ -12,7 +17,7 @@
                                            package)
               (format t "~A written to disk.~%"
                       (deb-packager::package-pathname package)))
-          (error (e) (format *error-output* "error writing .deb: ~A" e)))))))
+          (error (e) (format *error-output* "error writing .deb: ~A~%" e)))))))
 
 (defun release-systems (release)
   "Fetches all the systems provided by a release."
