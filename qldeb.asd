@@ -13,7 +13,8 @@
                :archive
                :deb-packager)
   :components ((:file "package")
-               (:file "deb-packager")
+               (:file "packager")
+               (:file "data-files")
                (:file "debian-package")
                (:file "release")
                (:file "qldeb")))
