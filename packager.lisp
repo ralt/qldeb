@@ -10,10 +10,11 @@
                    (read-entry (archive-entry archive (asd-path release system))))))
     (make-instance
      'deb-packager:deb-package
-     :name (ql-dist:name system)
+     :name (make-symbol (ql-dist:name system))
      :changelog (make-changelog-entry system asd-form)
      :description (or (getf asd-form :description) *dummy-description*)
      :architecture "all"
+     :build-depends nil
      :depends (when (ql-dist:required-systems system)
                 (format-dependencies
                  system
