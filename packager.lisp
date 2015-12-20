@@ -1,6 +1,6 @@
 (in-package #:qldeb)
 
-(defun make-package (archive system))
+(defun make-deb-packager (archive system))
 
 (defvar *dummy-author-email* "dummy@author.com")
 (defvar *dummy-author* (format nil "Dummy author <~A>" *dummy-author-email*))

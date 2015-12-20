@@ -4,7 +4,7 @@
   (let ((archive (archive:open-archive
                   'archive:tar-archive
                   (flexi-streams:make-in-memory-input-stream archive-array)))
-        (package (make-package archive system))
+        (package (make-deb-packager archive system))
         (control-files (make-control-files archive system))
         (data-files (make-data-files archive system)))
     (multiple-value-prog1 package
