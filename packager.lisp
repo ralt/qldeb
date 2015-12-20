@@ -11,7 +11,17 @@
     (make-instance
      'deb-packager:deb-package
      :name (ql-dist:name system)
-     :changelog (make-changelog-entry system asd-form))))
+     :changelog (make-changelog-entry system asd-form)
+     :description (or (getf asd-form :description) *dummy-description*)
+     :architecture "all"
+     :depends (when (ql-dist:required-systems system)
+                (format-dependencies
+                 system
+                 (ql-dist:required-systems system)))
+     :long-description (when (getf asd-form :long-description)
+                         (format-long-description
+                          (getf asd-form :long-description)))
+     :maintainer (author asd-form))))
 
 (defun make-changelog-entry (system asd-form)
   (make-array
@@ -59,3 +69,8 @@
                         ;; The system name
                         (string-downcase (symbol-name (second form))))))
            (uiop:slurp-stream-forms asd-stream)))
+
+(defun format-long-description (text)
+  (let ((scanner (ppcre:create-scanner "^[ ]*$" :multi-line-mode t)))
+    (ppcre:regex-replace-all scanner (format nil "~{ ~A~%~}" (uiop:split-string text :separator "
+")) " .")))
