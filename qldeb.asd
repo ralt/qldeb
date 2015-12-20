@@ -15,6 +15,7 @@
                :deb-packager)
   :components ((:file "package")
                (:file "archive")
+               (:file "reader")
                (:file "packager")
                (:file "data-files")
                (:file "debian-package")

@@ -69,11 +69,7 @@
                (string= (ql-dist:name system)
                         ;; The system name
                         (string-downcase (symbol-name (second form))))))
-           ;; "continue: use symbol anyway"
-           (handler-bind ((sb-int:simple-reader-package-error (lambda (c)
-                                                                (declare (ignore c))
-                                                                (continue))))
-             (uiop:slurp-stream-forms asd-stream))))
+           (read-asd (flexi-streams:octets-to-string asd-stream))))
 
 (defun format-long-description (text)
   (let ((scanner (ppcre:create-scanner "^[ ]*$" :multi-line-mode t)))
