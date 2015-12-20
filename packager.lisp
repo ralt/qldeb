@@ -5,7 +5,23 @@
                    (uiop:strcat (ql-dist:prefix release) "/")))
 
 (defun make-deb-packager (archive system release)
-  (let ((asd (asd-form (read-entry (archive-entry archive (asd-path release system))))))))
+  (let ((asd-form (get-asd-form
+                   system
+                   (read-entry (archive-entry archive (asd-path release system))))))
+    (make-instance
+     'deb-packager:deb-package
+     :name (ql-dist:name system)
+     :changelog (make-changelog-entry system asd-form))))
+
+(defun make-changelog-entry (system asd-form)
+  (make-array
+   1
+   :initial-contents (list (make-instance
+                            'deb-packager:changelog-entry
+                            :version (system-version system)
+                            :author (author asd-form)
+                            :message "qldeb changelog"
+                            :date 1434665940))))
 
 (defvar *dummy-author-email* "dummy@author.com")
 (defvar *dummy-author* (format nil "Dummy author <~A>" *dummy-author-email*))
