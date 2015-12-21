@@ -17,8 +17,11 @@
                               (format-path (archive::%name entry))))
                :content bytes
                :size (length bytes)
-               :mode (archive::mode entry))
+               :mode (octal-to-integer (archive::mode entry)))
               data-files)))))))
+
+(defun octal-to-integer (octal)
+  (parse-integer (format nil "~8R" octal)))
 
 (defun format-path (path)
   (format nil "~{~A~^/~}" (subseq
