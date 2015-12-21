@@ -18,11 +18,9 @@
 
 (defun archive-entry (archive path)
   (loop-entries (entry archive)
-     (when (and
-            (archive:entry-regular-file-p entry)
-            (pathname-match-p path (pathname
-                                    (flexi-streams:octets-to-string
-                                     (archive::%name entry)))))
+     (when (pathname-match-p path (pathname
+                                   (flexi-streams:octets-to-string
+                                    (archive::%name entry))))
        (return-from archive-entry entry))))
 
 (defun read-entry (entry)
