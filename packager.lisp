@@ -1,7 +1,10 @@
 (in-package #:qldeb)
 
 (defun system-name (system)
-  (ppcre:regex-replace-all "/" (ql-dist:name system) "--"))
+  (format-system-name (ql-dist:name system)))
+
+(defun format-system-name (name)
+  (uiop:strcat "cl-" (ppcre:regex-replace-all "/" name "--")))
 
 (defun asd-path (system)
   (merge-pathnames (uiop:strcat (ql-dist:system-file-name system) ".asd")
@@ -55,9 +58,9 @@
 (defun format-dependencies (system dependencies)
   (mapcar (lambda (dependency)
             (format nil "~A (>= ~A), ~A (<< ~A)"
-                    dependency (system-version system)
-                    dependency (1+ (parse-integer
-                                    (system-version system)))))
+                    (format-system-name dependency) (system-version system)
+                    (format-system-name dependency) (1+ (parse-integer
+                                                         (system-version system)))))
           dependencies))
 
 (defun system-version (system)
