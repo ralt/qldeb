@@ -5,9 +5,9 @@
                    (uiop:strcat (ql-dist:prefix (ql-dist:release system)) "/")))
 
 (defun make-deb-packager (archive system)
-  (let ((asd-form (get-asd-form
-                   system
-                   (read-entry (archive-entry archive (asd-path system))))))
+  (let ((asd-form (system-file-info
+                   (read-entry (archive-entry archive (asd-path system)))
+                   system)))
     (make-instance
      'deb-packager:deb-package
      :name (make-symbol (ql-dist:name system))
@@ -58,18 +58,6 @@
 (defun system-version (system)
   (format nil "~{~A~}" (uiop:split-string (ql-dist:version (ql-dist:dist system))
                                           :separator "-")))
-
-(defun get-asd-form (system asd-stream)
-  "
-  An asd file can have multiple systems in it.
-  "
-  (find-if (lambda (form)
-             (when (and (second form)
-                        (symbolp (second form)))
-               (string= (ql-dist:name system)
-                        ;; The system name
-                        (string-downcase (symbol-name (second form))))))
-           (read-asd (flexi-streams:octets-to-string asd-stream))))
 
 (defun format-long-description (text)
   (let ((scanner (ppcre:create-scanner "^[ ]*$" :multi-line-mode t)))
