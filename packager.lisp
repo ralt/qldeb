@@ -50,9 +50,10 @@
 
 (defun format-dependencies (system dependencies)
   (mapcar (lambda (dependency)
-            (list (format nil "~A (>= ~A)" dependency (system-version system))
-                  (format nil "~A (<< ~A)" dependency (1+ (parse-integer
-                                                           (system-version system))))))
+            (format nil "~A (>= ~A), ~A (<< ~A)"
+                    dependency (system-version system)
+                    dependency (1+ (parse-integer
+                                    (system-version system)))))
           dependencies))
 
 (defun system-version (system)
