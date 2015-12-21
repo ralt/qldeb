@@ -1,5 +1,8 @@
 (in-package #:qldeb)
 
+;;; Taken from http://paste.lisp.org/display/246995
+;;; Graciously provided by Xach on irc.
+
 (defun defsystem-form-info (defsystem)
   (list :name (string-downcase (second defsystem))
         :license (or (getf defsystem :license)
