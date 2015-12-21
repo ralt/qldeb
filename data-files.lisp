@@ -2,7 +2,7 @@
 
 (defun make-data-files (archive system)
   (let ((data-files (make-array 0 :adjustable t :fill-pointer 0)))
-    (archive:do-archive-entries (entry archive data-files)
+    (do-archive-entries (entry archive data-files)
       (when (archive:entry-regular-file-p entry)
         (let ((bytes (make-array (archive::size entry)
                                  :element-type '(unsigned-byte 8))))
