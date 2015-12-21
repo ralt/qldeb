@@ -17,7 +17,8 @@
                                            package)
               (format t "~A written to disk.~%"
                       (deb-packager::package-pathname package)))
-          (error (e) (format *error-output* "error writing .deb: ~A~%" e)))))))
+          (error (e) (format *error-output* "error writing ~A: ~A~%"
+                             (deb-packager::package-pathname package) e)))))))
 
 (defun release-systems (release)
   "Fetches all the systems provided by a release."

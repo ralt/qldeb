@@ -19,9 +19,10 @@
                 (format-dependencies
                  system
                  (ql-dist:required-systems system)))
-     :long-description (when (getf asd-form :long-description)
-                         (format-long-description
-                          (getf asd-form :long-description)))
+     :long-description (if (getf asd-form :long-description)
+                           (format-long-description
+                            (getf asd-form :long-description))
+                           "")
      :maintainer (author asd-form))))
 
 (defun make-changelog-entry (system asd-form)
