@@ -1,5 +1,8 @@
 (in-package #:qldeb)
 
+(defun system-name (system)
+  (ppcre:regex-replace-all "/" (ql-dist:name system) "--"))
+
 (defun asd-path (system)
   (merge-pathnames (uiop:strcat (ql-dist:system-file-name system) ".asd")
                    (uiop:strcat (ql-dist:prefix (ql-dist:release system)) "/")))
@@ -10,7 +13,7 @@
                    system)))
     (make-instance
      'deb-packager:deb-package
-     :name (make-symbol (ql-dist:name system))
+     :name (make-symbol (system-name system))
      :changelog (make-changelog-entry system asd-form)
      :description (or (getf asd-form :description) *dummy-description*)
      :architecture "all"

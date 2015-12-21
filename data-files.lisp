@@ -13,7 +13,7 @@
                'deb-packager:deb-file
                :path (pathname
                       (format nil "usr/share/common-lisp/source/~A/~A"
-                              (ql-dist:name system)
+                              (system-name system)
                               (format-path (archive::%name entry))))
                :content bytes
                :size (length bytes)
