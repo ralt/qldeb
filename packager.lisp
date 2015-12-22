@@ -36,7 +36,7 @@
    1
    :initial-contents (list (make-instance
                             'deb-packager:changelog-entry
-                            :version (system-version system)
+                            :version (uiop:strcat (system-version system) "~qldeb1")
                             :author (author asd-form)
                             :message "qldeb changelog"
                             :date 1434665940))))
@@ -59,14 +59,14 @@
   (mapcar (lambda (dependency)
             (format nil "~A (>= ~A), ~A (<< ~A)"
                     (format-system-name dependency) (system-version system)
-                    (format-system-name dependency) (1+ (parse-integer
-                                                         (system-version system)))))
+                    (format-system-name dependency) (1+ (system-version system))))
           dependencies))
 
 (defun system-version (system)
-  (format nil "~{~A~}~~qldeb1" (uiop:split-string
-                                (ql-dist:version (ql-dist:dist system))
-                                :separator "-")))
+  (parse-integer
+   (format nil "~{~A~}" (uiop:split-string
+                         (ql-dist:version (ql-dist:dist system))
+                         :separator "-"))))
 
 (defun format-long-description (text)
   (let ((scanner (ppcre:create-scanner "^[ ]*$" :multi-line-mode t)))
