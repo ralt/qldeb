@@ -26,3 +26,6 @@
          while line
          count (when (> (length line) len)
                  (string= key line :end2 len))))))
+
+(defun log (priority text &rest args)
+  (syslog:log "qldeb" :local0 priority (apply #'format nil text args)))

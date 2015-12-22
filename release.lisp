@@ -3,22 +3,21 @@
 (defun download-and-package (release)
   (let ((archive (download-release release)))
     (dolist (system (release-systems release))
-      (format t "building debian package for ~A...~%" (ql-dist:name system))
+      (log :info "building debian package for ~A...~%" (ql-dist:name system))
       (let ((package (handler-case
                          (make-debian-package archive system)
                        (error (e) (progn
-                                    (format *error-output*
-                                            "error generating package: ~A~%" e)
+                                    (log :error "error generating package: ~A~%" e)
                                     (return-from download-and-package))))))
-        (format t "debian package for ~A built.~%" (ql-dist:name system))
+        (log :info "debian package for ~A built.~%" (ql-dist:name system))
         (handler-case
             (progn
               (deb-packager:write-deb-file (deb-packager::package-pathname package)
                                            package)
-              (format t "~A written to disk.~%"
-                      (deb-packager::package-pathname package)))
-          (error (e) (format *error-output* "error writing ~A: ~A~%"
-                             (deb-packager::package-pathname package) e)))))))
+              (log :info "~A written to disk.~%"
+                   (deb-packager::package-pathname package)))
+          (error (e) (log :error "error writing ~A: ~A~%"
+                          (deb-packager::package-pathname package) e)))))))
 
 (defun release-systems (release)
   "Fetches all the systems provided by a release."
@@ -28,12 +27,12 @@
 
 (defun download-release (release)
   (let ((url (ql-dist:archive-url release)))
-    (format t "downloading ~A...~%" url)
+    (log :info "downloading ~A...~%" url)
     (let ((archive (drakma:http-request url :force-binary t)))
       (unless (check-archive release archive)
-        (format t "~A download corrupted, trying again...~%" url)
+        (log :debug "~A download corrupted, trying again...~%" url)
         (return-from download-release (download-release release)))
-      (format t "~A's archive is downloaded~%" (ql-dist:project-name release))
+      (log :info "~A's archive is downloaded~%" (ql-dist:project-name release))
       archive)))
 
 (defun check-archive (release archive)

@@ -12,6 +12,7 @@
                :cl-ppcre
                :archive
                :gzip-stream
+               :cl-syslog
                :deb-packager)
   :components ((:file "package")
                (:file "archive")
