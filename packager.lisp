@@ -36,7 +36,7 @@
    1
    :initial-contents (list (make-instance
                             'deb-packager:changelog-entry
-                            :version (uiop:strcat (system-version system) "~qldeb1")
+                            :version (system-version system)
                             :author (author asd-form)
                             :message "qldeb changelog"
                             :date 1434665940))))
