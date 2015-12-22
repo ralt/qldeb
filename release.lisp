@@ -7,7 +7,7 @@
       (let ((package (handler-case
                          (make-debian-package archive system)
                        (error (e) (progn
-                                    (log :error "error generating package: ~A~%" e)
+                                    (log :err "error generating package: ~A~%" e)
                                     (return-from download-and-package))))))
         (log :info "debian package for ~A built.~%" (ql-dist:name system))
         (handler-case
@@ -16,7 +16,7 @@
                                            package)
               (log :info "~A written to disk.~%"
                    (deb-packager::package-pathname package)))
-          (error (e) (log :error "error writing ~A: ~A~%"
+          (error (e) (log :err "error writing ~A: ~A~%"
                           (deb-packager::package-pathname package) e)))))))
 
 (defun release-systems (release)
