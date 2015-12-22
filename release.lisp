@@ -7,7 +7,8 @@
       (let ((package (handler-case
                          (make-debian-package archive system)
                        (error (e) (progn
-                                    (log :err "error generating package: ~A~%" e)
+                                    (log :err "error generating package ~A: ~A~%"
+                                         (ql-dist:name system) e)
                                     (return-from download-and-package))))))
         (log :info "debian package for ~A built.~%" (ql-dist:name system))
         (handler-case
