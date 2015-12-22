@@ -14,12 +14,12 @@ Some packages currently can't be built:
 - km
 - pettomato-indexed-priority-queue
 
-`dcm` and `pettomato-indexed-priority-queue` should be fixable,
-`cl-prevalence-test` looks like a bug in quicklisp distribution, and
-`antik` and `km` are because the release's archive is invalid.
+`dcm`, `pettomato-indexed-priority-queue` and `cl-prevalence-test`
+should be fixable, `antik` and `km` are because the release's
+archive is invalid.
 
-That said, out of 3200 packages, having 5 missing packages is pretty
-good.
+That said, out of 3200 packages, having 5 missing packages is fairly
+OK.
 
 ### Out of heap memory
 
